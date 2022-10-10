@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
-// KANJIERC721A.sol
+// SBTERC721A.sol
 pragma solidity ^0.8.6;
 
-//import '@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol';
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/common/ERC2981.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
@@ -14,7 +13,7 @@ import "./lib/UERC721A.sol";
 import "./lib/PaymentSplitter.sol";
 import "./lib/MerkleProof.sol";
 
-contract KANJISBTERC721A is UERC721A, Ownable, ReentrancyGuard, ERC2981, PaymentSplitter {
+contract SBTERC721A is UERC721A, Ownable, ReentrancyGuard, ERC2981, PaymentSplitter {
   using Strings for uint256;
   using BitMaps for BitMaps.BitMap;
 
@@ -48,8 +47,6 @@ contract KANJISBTERC721A is UERC721A, Ownable, ReentrancyGuard, ERC2981, Payment
   bytes4 private constant _INTERFACE_ID_ERC2981 = 0x2a55205a;
   bytes4 private constant _INTERFACE_ID_ERC165 = 0x01ffc9a7;
 
-  /// @dev Type of contract
-  bytes32 public constant MODULE_TYPE = bytes32("KANJIERC721A");
 
   event Mints(uint256 id, address minter, address receiver, uint256 quantity);
 
