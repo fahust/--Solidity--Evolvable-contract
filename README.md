@@ -1,4 +1,4 @@
-# Inverse smart contracts
+# Customs smart contracts
 
 ### Install library dependancies for local test
 
