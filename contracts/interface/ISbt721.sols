@@ -13,7 +13,7 @@ import "./lib/UERC721A.sol";
 import "./lib/PaymentSplitter.sol";
 import "./lib/MerkleProof.sol";
 
-contract SBTERC1155 is UERC721A, Ownable, ReentrancyGuard, ERC2981, PaymentSplitter {
+contract SBTERC721A is UERC721A, Ownable, ReentrancyGuard, ERC2981, PaymentSplitter {
   using Strings for uint256;
   using BitMaps for BitMaps.BitMap;
 
