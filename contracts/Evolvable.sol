@@ -24,14 +24,14 @@ import "./lib/StructEvolvable.sol";
 
 import "./interface/IEvolvable.sol";
 
-contract EVOLVABLEPHOENIX is
+contract EVOLVABLE is
   ERC1155Supply,
   ERC1155Burnable,
   Ownable,
   ReentrancyGuard,
   ERC2981,
   PaymentSplitter,
-  IEVOLVABLEPHOENIX
+  IEVOLVABLE
 {
   using BitMaps for BitMaps.BitMap;
   using Strings for uint256;
@@ -97,7 +97,7 @@ contract EVOLVABLEPHOENIX is
   uint256 public countTokenClaimed;
 
   /// @dev Type of contract
-  bytes32 public constant MODULE_TYPE = bytes32("EVOLVABLEPHOENIX");
+  bytes32 public constant MODULE_TYPE = bytes32("EVOLVABLE");
   /// @dev Version of contract
   uint256 public constant VERSION = 1;
 
