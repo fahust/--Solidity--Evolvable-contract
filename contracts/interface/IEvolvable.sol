@@ -7,7 +7,7 @@ pragma solidity ^0.8.6;
 import "@openzeppelin/contracts/utils/structs/BitMaps.sol";
 import "../lib/StructEvolvable.sol";
 
-interface IEVOLVABLEPHOENIX {
+interface IEVOLVABLE {
   /// @notice return Opensea contract level metadata
   /// @return _contractURI URI of json contract level metadatas
   function contractURI() external view returns (string memory);
