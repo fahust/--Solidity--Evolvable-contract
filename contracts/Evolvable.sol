@@ -20,6 +20,9 @@ import "./lib/PaymentSplitter.sol";
 
 import "./lib/MerkleProof.sol";
 import "./lib/CurrencyTransferLib.sol";
+import "./lib/StructEvolvable.sol";
+
+import "./interface/IEvolvable.sol";
 
 contract EVOLVABLEPHOENIX is
   ERC1155Supply,
@@ -27,7 +30,8 @@ contract EVOLVABLEPHOENIX is
   Ownable,
   ReentrancyGuard,
   ERC2981,
-  PaymentSplitter
+  PaymentSplitter,
+  IEVOLVABLEPHOENIX
 {
   using BitMaps for BitMaps.BitMap;
   using Strings for uint256;
@@ -35,30 +39,6 @@ contract EVOLVABLEPHOENIX is
   /*///////////////////////////////////////////////////////////////
                                 Structure
     //////////////////////////////////////////////////////////////*/
-  struct ClaimCondition {
-    uint256 startTimestamp;
-    uint256 endTimestamp;
-    uint256 maxClaimableSupply;
-    uint256 supplyClaimed;
-    uint256 quantityLimitPerTransaction;
-    uint256 waitTimeInSecondsBetweenClaims;
-    uint256 pricePerToken;
-    bytes32 merkleRoot;
-    address currency;
-    uint256[] cardIdToMint;
-    uint256[] cardIdToRedeem;
-    address[] ERC721Required;
-    address ERC1155Required;
-    uint256 ERC1155IdRequired;
-  }
-
-  struct ClaimConditionList {
-    uint256 currentStartId;
-    uint256 count;
-    mapping(uint256 => ClaimCondition) phases;
-    mapping(uint256 => mapping(address => uint256)) limitLastClaimTimestamp;
-    mapping(uint256 => BitMaps.BitMap) limitMerkleProofClaim;
-  }
 
   /// @dev Largest tokenId of each batch of tokens with the same baseURI
   uint256[] public baseURIIndices;
@@ -83,7 +63,7 @@ contract EVOLVABLEPHOENIX is
   uint256 public maxTotalSupply;
 
   /// @dev The set of all claim conditions, at any given moment.
-  ClaimConditionList private claimCondition;
+  EvolvableLib.ClaimConditionList private claimCondition;
 
   /// @dev Mapping from address => total number of NFTs a wallet has claimed.
   mapping(address => uint256) public walletClaimCount;
@@ -145,7 +125,7 @@ contract EVOLVABLEPHOENIX is
   );
 
   /// @dev Emitted when new claim conditions are set for a token.
-  event ClaimConditionsUpdated(ClaimCondition[] claimConditions);
+  event ClaimConditionsUpdated(EvolvableLib.ClaimCondition[] claimConditions);
 
   /// @dev Emitted when the global max supply of a token is updated.
   event MaxTotalSupplyUpdated(uint256 indexed maxTotalSupply);
@@ -274,13 +254,9 @@ contract EVOLVABLEPHOENIX is
     _contractURI = __contractURI;
   }
 
-  function supportsInterface(bytes4 interfaceId)
-    public
-    view
-    virtual
-    override(ERC1155, ERC2981)
-    returns (bool)
-  {
+  function supportsInterface(
+    bytes4 interfaceId
+  ) public view virtual override(ERC1155, ERC2981) returns (bool) {
     if (interfaceId == _INTERFACE_ID_ERC2981) {
       return true;
     }
@@ -314,10 +290,10 @@ contract EVOLVABLEPHOENIX is
   /// @notice Prepare datas for mint tokens with base uri for tokens and optional revealable encrypted uri
   /// @param _amount quantity of token you want to prepared mint
   /// @param _baseURIForTokens real uri for your token if not _encryptedBaseURI or flask if encrypt _encryptedBaseURI exist
-  function lazyMint(uint256 _amount, string calldata _baseURIForTokens)
-    external
-    onlyOwner
-  {
+  function lazyMint(
+    uint256 _amount,
+    string calldata _baseURIForTokens
+  ) external onlyOwner {
     uint256 startId = nextTokenIdToMint;
     uint256 baseURIIndex = startId + _amount;
 
@@ -332,10 +308,10 @@ contract EVOLVABLEPHOENIX is
   /// @param _phases array of new claim conditions updated
   /// @param _resetClaimEligibility reset all value of claim conditions
   function setClaimConditions(
-    ClaimCondition[] calldata _phases,
+    EvolvableLib.ClaimCondition[] calldata _phases,
     bool _resetClaimEligibility
   ) external onlyOwner {
-    ClaimConditionList storage condition = claimCondition;
+    EvolvableLib.ClaimConditionList storage condition = claimCondition;
     uint256 existingStartIndex = condition.currentStartId;
     uint256 existingPhaseCount = condition.count;
     uint256 newStartIndex = existingStartIndex;
@@ -604,7 +580,9 @@ contract EVOLVABLEPHOENIX is
     uint256 _pricePerToken,
     bool verifyMaxQuantityPerTransaction
   ) public view {
-    ClaimCondition memory currentClaimPhase = claimCondition.phases[_conditionId];
+    EvolvableLib.ClaimCondition memory currentClaimPhase = claimCondition.phases[
+      _conditionId
+    ];
     if (
       _currency != currentClaimPhase.currency ||
       _pricePerToken != currentClaimPhase.pricePerToken
@@ -699,7 +677,9 @@ contract EVOLVABLEPHOENIX is
     bytes32[] calldata _proofs,
     uint256 _proofMaxQuantityPerTransaction
   ) public view returns (bool validMerkleProof, uint256 merkleProofIndex) {
-    ClaimCondition memory currentClaimPhase = claimCondition.phases[_conditionId];
+    EvolvableLib.ClaimCondition memory currentClaimPhase = claimCondition.phases[
+      _conditionId
+    ];
 
     if (currentClaimPhase.merkleRoot != bytes32(0)) {
       (validMerkleProof, merkleProofIndex) = MerkleProofLib.verify(
@@ -729,10 +709,10 @@ contract EVOLVABLEPHOENIX is
   }
 
   /// @notice owner mint a reserve of tokens to specific address
-  function mintOwner(uint256[] calldata quantities, uint256[] calldata ids)
-    external
-    onlyOwner
-  {
+  function mintOwner(
+    uint256[] calldata quantities,
+    uint256[] calldata ids
+  ) external onlyOwner {
     uint256 countTokenClaimedLocal = countTokenClaimed;
     for (uint256 index = 0; index < quantities.length; index++) {
       if (quantities[index] > countTokenClaimedLocal + quantities[index])
@@ -750,7 +730,7 @@ contract EVOLVABLEPHOENIX is
 
   /// @notice Return current claim condition
   function getActiveClaimConditionId() public view returns (uint256) {
-    ClaimConditionList storage conditionList = claimCondition;
+    EvolvableLib.ClaimConditionList storage conditionList = claimCondition;
     for (uint256 i = conditionList.count; i > 0; i--) {
       if (
         block.timestamp >= conditionList.phases[i - 1].startTimestamp &&
@@ -766,11 +746,10 @@ contract EVOLVABLEPHOENIX is
   /// @notice Return timestamp for next valid claim for only one claimer
   /// @param _conditionId id of collection you wan to get claim timestamp
   /// @param _claimer address wallet of one claimer
-  function getClaimTimestamp(uint256 _conditionId, address _claimer)
-    public
-    view
-    returns (uint256 lastClaimTimestamp, uint256 nextValidClaimTimestamp)
-  {
+  function getClaimTimestamp(
+    uint256 _conditionId,
+    address _claimer
+  ) public view returns (uint256 lastClaimTimestamp, uint256 nextValidClaimTimestamp) {
     lastClaimTimestamp = claimCondition.limitLastClaimTimestamp[_conditionId][_claimer];
 
     unchecked {
@@ -787,11 +766,9 @@ contract EVOLVABLEPHOENIX is
   /// @notice Returns the claim condition at the given uid.
   /// @param _conditionId if of collection you want to return
   /// @return condition claim condition structure
-  function getClaimConditionById(uint256 _conditionId)
-    external
-    view
-    returns (ClaimCondition memory condition)
-  {
+  function getClaimConditionById(
+    uint256 _conditionId
+  ) external view returns (EvolvableLib.ClaimCondition memory condition) {
     condition = claimCondition.phases[_conditionId];
   }
 

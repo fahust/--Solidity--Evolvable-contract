@@ -13,7 +13,16 @@ import "./lib/UERC721A.sol";
 import "./lib/PaymentSplitter.sol";
 import "./lib/MerkleProof.sol";
 
-contract SBTERC1155 is UERC721A, Ownable, ReentrancyGuard, ERC2981, PaymentSplitter {
+import "./interface/ISbt1155.sol";
+
+contract SBTERC1155 is
+  UERC721A,
+  Ownable,
+  ReentrancyGuard,
+  ERC2981,
+  PaymentSplitter,
+  ISBTERC1155
+{
   using Strings for uint256;
   using BitMaps for BitMaps.BitMap;
 
@@ -46,7 +55,6 @@ contract SBTERC1155 is UERC721A, Ownable, ReentrancyGuard, ERC2981, PaymentSplit
   /// @dev INTERFACE SUPPORTED
   bytes4 private constant _INTERFACE_ID_ERC2981 = 0x2a55205a;
   bytes4 private constant _INTERFACE_ID_ERC165 = 0x01ffc9a7;
-
 
   event Mints(uint256 id, address minter, address receiver, uint256 quantity);
 
@@ -93,13 +101,9 @@ contract SBTERC1155 is UERC721A, Ownable, ReentrancyGuard, ERC2981, PaymentSplit
     _setDefaultRoyalty(payable(address(this)), _royaltyFeesInBips);
   }
 
-  function supportsInterface(bytes4 interfaceId)
-    public
-    view
-    virtual
-    override(UERC721A, ERC2981)
-    returns (bool)
-  {
+  function supportsInterface(
+    bytes4 interfaceId
+  ) public view virtual override(UERC721A, ERC2981) returns (bool) {
     if (interfaceId == _INTERFACE_ID_ERC2981) {
       return true;
     }

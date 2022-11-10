@@ -5,34 +5,9 @@
 pragma solidity ^0.8.6;
 
 import "@openzeppelin/contracts/utils/structs/BitMaps.sol";
+import "../lib/StructEvolvable.sol";
 
-
-interface EVOLVABLEPHOENIX {
-  struct ClaimCondition {
-    uint256 startTimestamp;
-    uint256 endTimestamp;
-    uint256 maxClaimableSupply;
-    uint256 supplyClaimed;
-    uint256 quantityLimitPerTransaction;
-    uint256 waitTimeInSecondsBetweenClaims;
-    uint256 pricePerToken;
-    bytes32 merkleRoot;
-    address currency;
-    uint256[] cardIdToMint;
-    uint256[] cardIdToRedeem;
-    address[] ERC721Required;
-    address ERC1155Required;
-    uint256 ERC1155IdRequired;
-  }
-
-  struct ClaimConditionList {
-    uint256 currentStartId;
-    uint256 count;
-    mapping(uint256 => ClaimCondition) phases;
-    mapping(uint256 => mapping(address => uint256)) limitLastClaimTimestamp;
-    mapping(uint256 => BitMaps.BitMap) limitMerkleProofClaim;
-  }
-
+interface IEVOLVABLEPHOENIX {
   /// @notice return Opensea contract level metadata
   /// @return _contractURI URI of json contract level metadatas
   function contractURI() external view returns (string memory);
@@ -51,7 +26,7 @@ interface EVOLVABLEPHOENIX {
   /// @param _phases array of new claim conditions updated
   /// @param _resetClaimEligibility reset all value of claim conditions
   function setClaimConditions(
-    ClaimCondition[] calldata _phases,
+    EvolvableLib.ClaimCondition[] calldata _phases,
     bool _resetClaimEligibility
   ) external;
 
@@ -117,7 +92,7 @@ interface EVOLVABLEPHOENIX {
   /// @return condition claim condition structure
   function getClaimConditionById(
     uint256 _conditionId
-  ) external view returns (ClaimCondition memory condition);
+  ) external view returns (EvolvableLib.ClaimCondition memory condition);
 
   /// @notice Returns the amount of stored baseURIs
   /// @return length length of baseURIIndices
