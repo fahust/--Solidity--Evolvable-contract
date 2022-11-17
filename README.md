@@ -1,6 +1,6 @@
 # Evolvable smart contracts
 
-<p align="center" width="100%"><img align="center" src="./doc/Evolvable%20contract%20.png?raw=true" /></p>
+<p align="center" width="100%"><img align="center" src="./doc/Evolvable%20contract.png?raw=true" /></p>
 
 ## Utils
 - **truffle** 5.6.3
