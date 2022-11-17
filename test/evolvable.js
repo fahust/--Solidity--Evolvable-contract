@@ -2,7 +2,7 @@ const { BigNumber, ethers } = require("ethers");
 const { MerkleTree } = require("merkletreejs");
 const keccak256 = require("keccak256");
 var RLP = require("rlp");
-const ArtifactCUSTOMEVOLVABLE = artifacts.require("CUSTOMEVOLVABLE");
+const ArtifactCUSTOMEVOLVABLE = artifacts.require("EVOLVABLE");
 const truffleAssert = require("truffle-assertions");
 const fs = require("fs");
 
