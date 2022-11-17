@@ -71,6 +71,17 @@ The package.json file contains a set of scripts to help on the development phase
 | [Phishing with tx.origin](https://hackernoon.com/hacking-solidity-contracts-using-txorigin-for-authorization-are-vulnerable-to-phishing) | Let’s say a call could be made to the vulnerable contract that passes the authorization check since tx.origin returns the original sender of the transaction which in this case is the authorized account |
 
 
+# CONTRACTS
+
+
+# Evolvable
+This contract is based on [ThirdWeb's ERC1155 drop contract](https://github.com/thirdweb-dev/contracts/blob/main/contracts/drop/DropERC1155.sol).
+
+I added the token burn and mint principle: an NFT owner can burn his token and redeem another one with an other ID, as seen on the [Adidas original contract](https://etherscan.io/address/0x28472a58a490c5e09a238847f66a68a47cc76f0f#code).
+
+## Deployment
+
+
 ```javascript
 let nonceME = await web3.eth.getTransactionCount(addressDeployer);
 var preGeneratedAddressContract = "0x" + web3.utils.sha3(
@@ -90,7 +101,7 @@ let contractLevelMetada = {
 
 let URIContractLevelMetadat = await sendToPinata(contractLevelMetada);
 
-this.buyReveal = await EVOLVABLE.new(
+this.evolvable = await EVOLVABLE.new(
     'Name',
     'Symbol',
     500,//Fees royalties for superrare
@@ -103,13 +114,3 @@ this.buyReveal = await EVOLVABLE.new(
     URIContractLevelMetadat,
 );// we deploy contract
 ```
-
-
-# CONTRACTS
-
-
-# Evolvable
-This contract is based on [ThirdWeb's ERC1155 drop contract](https://github.com/thirdweb-dev/contracts/blob/main/contracts/drop/DropERC1155.sol).
-
-I added the token burn and mint principle: an NFT owner can burn his token and redeem another one with an other ID, as seen on the [Adidas original contract](https://etherscan.io/address/0x28472a58a490c5e09a238847f66a68a47cc76f0f#code).
-
