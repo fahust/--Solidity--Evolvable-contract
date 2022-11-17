@@ -1,0 +1,10 @@
+
+
+
+EVOLVABLE CONTRACT
+Brand account, wei balance at the end of drop : 999739841400000000000
+ERC1155contract, wei balance at the end of drop : 0
+Brand client account, token balance ERC1155 id 0 at the end of drop : 99
+Brand client account, token balance ERC1155 id 1 at the end of drop : 0
+Brand client account, token balance ERC1155 id 2 at the end of drop : 1
+Brand client account 2, token balance ERC1155 at the end of drop : 10
